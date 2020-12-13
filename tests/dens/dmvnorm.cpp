@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2011-2018 Keith O'Hara
+  ##   Copyright (C) 2011-2020 Keith O'Hara
   ##
   ##   This file is part of the StatsLib C++ library.
   ##
@@ -18,12 +18,14 @@
   ##
   ################################################################################*/
 
-#include "stats.hpp"
+#define TEST_PRINT_PRECISION_1 2
+#define TEST_PRINT_PRECISION_2 5
+
 #include "../stats_tests.hpp"
 
 int main()
 {
-#ifdef STATS_TEST_MAT
+#ifdef STATS_TEST_MATRIX_FEATURES
     int K = 3;
 
     std::cout << "\n*** dmvnorm: begin tests. ***\n" << std::endl;
@@ -40,7 +42,19 @@ int main()
 
     std::cout << "density value: " << dmvnorm_val << "." << std::endl;
 
-    std::cout << "\n*** dmvnorm: tests finished. ***\n" << std::endl;
+#ifdef STATS_ENABLE_EIGEN_WRAPPERS
+    // test static versions
+    Eigen::Matrix<double, 3, 1> X2(1, 1, 1);
+    Eigen::Matrix<double, 3, 1> mean(0, 0, 0);
+    Eigen::Matrix<double, 3, 3> Sigma2 = Eigen::Matrix3d::Identity();
+
+    double p = stats::dmvnorm(X2, mean, Sigma2);
+    std::cout << "p = " << p << "." << std::endl;
 #endif
+
+    std::cout << "\n*** dmvnorm: tests finished. ***\n" << std::endl;
+
+#endif
+
     return 0;
 }

@@ -5,7 +5,7 @@ sudo: required
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: bionic
       addons:
         apt:
           packages:
@@ -18,7 +18,7 @@ matrix:
       compiler: gcc
     
     - os: linux
-      dist: trusty
+      dist: bionic
       addons:
         apt:
           packages:
@@ -31,7 +31,7 @@ matrix:
       compiler: gcc
 
     - os: linux
-      dist: trusty
+      dist: bionic
       addons:
         apt:
           packages:
@@ -41,10 +41,55 @@ matrix:
             - ubuntu-toolchain-r-test
       env:
         - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && FC=gfortran-7"
+        - STATS_TEST_USE_STDVEC="y"
+        - CCOV=gcov-7 && CXXCOV=gcov-7
+        - STATS_TEST_RUN_COV="y"
       compiler: gcc
 
     - os: linux
-      dist: trusty
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - g++-7
+            - gfortran-7
+          sources: &sources
+            - ubuntu-toolchain-r-test
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && FC=gfortran-7"
+        - STATS_TEST_USE_ARMA="y"
+      compiler: gcc
+
+    - os: linux
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - g++-7
+            - gfortran-7
+          sources: &sources
+            - ubuntu-toolchain-r-test
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && FC=gfortran-7"
+        - STATS_TEST_USE_BLAZE="y"
+      compiler: gcc
+
+    - os: linux
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - g++-7
+            - gfortran-7
+          sources: &sources
+            - ubuntu-toolchain-r-test
+      env:
+        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7 && FC=gfortran-7"
+        - STATS_TEST_USE_EIGEN="y"
+      compiler: gcc
+
+    - os: linux
+      dist: bionic
       addons:
         apt:
           packages:
@@ -56,6 +101,19 @@ matrix:
         - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8 && FC=gfortran-8"
       compiler: gcc
 
+    - os: linux
+      dist: bionic
+      addons:
+        apt:
+          packages:
+            - g++-9
+            - gfortran-9
+          sources: &sources
+            - ubuntu-toolchain-r-test
+      env:
+        - MATRIX_EVAL="CC=gcc-9 && CXX=g++-9 && FC=gfortran-9"
+      compiler: gcc
+
     - os: osx
       osx_image: xcode9
       env:
@@ -63,7 +121,7 @@ matrix:
       compiler: clang
 
     # - os: linux
-    #   dist: trusty
+    #   dist: bionic
     #   addons:
     #     apt:
     #       packages:
@@ -72,7 +130,7 @@ matrix:
     #         - gfortran-7
     #       sources: &sources
     #         - ubuntu-toolchain-r-test
-    #         - llvm-toolchain-trusty-5.0
+    #         - llvm-toolchain-bionic-5.0
     #   env:
     #     - MATRIX_EVAL="CC=clang-5.0 && CXX=clang++-5.0 && FC=gfortran-7"
     #   compiler: clang
@@ -93,6 +151,8 @@ install:
 
 script:
   - cd .. && rm -rf stats
+  - git clone https://github.com/kthohr/gcem ./gcem
+  - export GCEM_INCLUDE_PATH=$PWD/gcem/include
   - git clone https://github.com/kthohr/stats ./stats
   - cd ./stats/tests
   - ./setup && ./test_setup/run_cov
@@ -100,9 +160,10 @@ script:
 
 after_success:
   - |
-      if [[ "${TRAVIS_OS_NAME}" == "linux" ]]; then
-        bash <(curl -s https://codecov.io/bash)
-      fi
+    if [[ "${STATS_TEST_RUN_COV}" == "y" ]]; then 
+      alias gcov=$CCOV
+      bash <(curl -s https://codecov.io/bash) -x $CCOV
+    fi
 
 after_failure:
   - ./travis-tool.sh dump_logs

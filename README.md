@@ -1,4 +1,4 @@
-# StatsLib &nbsp; [![Mentioned in Awesome Cpp](https://awesome.re/mentioned-badge.svg)](https://github.com/fffaraz/awesome-cpp#math) [![Build Status](https://travis-ci.org/kthohr/stats.svg?branch=master)](https://travis-ci.org/kthohr/stats) [![Coverage Status](https://codecov.io/github/kthohr/stats/coverage.svg?branch=master)](https://codecov.io/github/kthohr/stats?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d6460e046dd5428aac53d28a1ce58401)](https://www.codacy.com/app/kthohr/stats?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kthohr/stats&amp;utm_campaign=Badge_Grade) [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg)](./LICENSE)
+# StatsLib &nbsp; [![Mentioned in Awesome Cpp](https://awesome.re/mentioned-badge.svg)](https://github.com/fffaraz/awesome-cpp#math) [![Build Status](https://travis-ci.org/kthohr/stats.svg?branch=master)](https://travis-ci.org/kthohr/stats) [![Coverage Status](https://codecov.io/github/kthohr/stats/coverage.svg?branch=master)](https://codecov.io/github/kthohr/stats?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/d6460e046dd5428aac53d28a1ce58401)](https://www.codacy.com/app/kthohr/stats?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=kthohr/stats&amp;utm_campaign=Badge_Grade) [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg)](./LICENSE) [![Documentation Status](https://readthedocs.org/projects/statslib/badge/?version=latest)](https://statslib.readthedocs.io/en/latest/?badge=latest)
 
 
 
@@ -6,9 +6,10 @@ StatsLib is a templated C++ library of statistical distribution functions, featu
 
 Features:
 * A header-only library of probability density functions, cumulative distribution functions, quantile functions, and random sampling methods.
-* Functions are written in a specialized C++11 `constexpr` format, enabling the library to operate as both a compile-time and run-time computation engine.
+* Functions are written in C++11 `constexpr` format, enabling the library to operate as both a compile-time and run-time computation engine.
 * Designed with a simple **R**-like syntax.
 * Optional vector-matrix functionality with wrappers to support:
+    * `std::vector`
     * [Armadillo](http://arma.sourceforge.net/)
     * [Blaze](https://bitbucket.org/blaze-lib/blaze)
     * [Eigen](http://eigen.tuxfamily.org/index.php)
@@ -16,12 +17,13 @@ Features:
 * Released under a permissive, non-GPL license.
 
 ### Contents:
-* [Distributions](#distributions) 
-* [Installation](#installation)
+* [Distributions](#distributions)
+* [Installation](#installation-and-depdencies)
+* [Documentation](#documentation)
 * [Jupyter Notebook](#jupyter-notebook)
 * [Options](#Options)
 * [Syntax and Examples](#syntax-and-examples)
-* [Compile-time Computation Capabilities](#compile-time-computation-capabilities)
+* [Compile-time Computation Capabilities](#compile-time-computing-capabilities)
 * [Author and License](#author)
 
 ## Distributions
@@ -52,19 +54,28 @@ In addition, pdf and random sampling functions are available for several multiva
 * Multivariate Normal
 * Wishart
 
-## Installation
+## Installation and Dependencies
 
 StatsLib is a header-only library. Simply add the header files to your project using
 ```cpp
 #include "stats.hpp"
 ```
 
+The only dependency is the latest version of [GCEM](https://github.com/kthohr/gcem) and a C++11 compatible compiler.
+
+## Documentation
+
+Full documentation is available online:
+
+[![Documentation Status](https://readthedocs.org/projects/statslib/badge/?version=latest)](https://statslib.readthedocs.io/en/latest/?badge=latest)
+
+A PDF version of the documentation is available [here](https://buildmedia.readthedocs.org/media/pdf/statslib/latest/statslib.pdf).
+
 ## Jupyter Notebook
 
 You can test the library online using an interactive Jupyter notebook: 
 
 [![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/kthohr/stats/master?filepath=notebooks%2Fstats.ipynb)
-
 
 ## Options
 
@@ -75,7 +86,7 @@ The following options should be declared **before** including the StatsLib heade
 #define STATS_GO_INLINE
 ```
 
-* OpenMP functionality is enabled by default if the `_OPENMP` macro is detected (e.g., by invoking `-fopenmp` with a GCC or Clang compiler). To explicitly enable OpenMP features use:
+* OpenMP functionality is enabled by default if the `_OPENMP` macro is detected (e.g., by invoking `-fopenmp` with GCC or Clang). To explicitly enable OpenMP features use:
 ```cpp
 #define STATS_USE_OPENMP
 ```
@@ -87,9 +98,14 @@ The following options should be declared **before** including the StatsLib heade
 
 * To use StatsLib with Armadillo, Blaze or Eigen:
 ```cpp
-#define STATS_USE_ARMA
-#define STATS_USE_BLAZE
-#define STATS_USE_EIGEN
+#define STATS_ENABLE_ARMA_WRAPPERS
+#define STATS_ENABLE_BLAZE_WRAPPERS
+#define STATS_ENABLE_EIGEN_WRAPPERS
+```
+
+* To enable wrappers for `std::vector`:
+```cpp
+#define STATS_ENABLE_STDVEC_WRAPPERS
 ```
 
 ## Syntax and Examples
@@ -124,7 +140,7 @@ All of these functions have matrix-based equivalents using Armadillo, Blaze, and
 arma::mat norm_pdf_vals = stats::dnorm(arma::ones(10,20),1.0,2.0);
 ```
 
-* The randomization functions (`r*`) can output random matrices of arbitrary size. For example,</li>
+* The randomization functions (`r*`) can output random matrices of arbitrary size. For example, For example, the following code will generate a 100-by-50 matrix of iid draws from a Gamma(3,2) distribution:</li>
 
 ```cpp
 // Armadillo:
@@ -134,13 +150,12 @@ blaze::DynamicMatrix<double> gamma_rvs = stats::rgamma<blaze::DynamicMatrix<doub
 // Eigen:
 Eigen::MatrixXd gamma_rvs = stats::rgamma<Eigen::MatrixXd>(100,50,3.0,2.0);
 ```
-&nbsp; &nbsp; &nbsp; &nbsp; will generate a 100-by-50 matrix of iid draws from a Gamma(3,2) distribution.
 
 * All matrix-based operations are parallelizable with OpenMP. For GCC and Clang compilers, simply include the `-fopenmp` option during compilation.
 
-### Seeding
+### Seeding Values
 
-Random number seeding is available in two formats: seed values and random number engines.
+Random number seeding is available in two forms: seed values and random number engines.
 
 * Seed values are passed as unsigned integers. For example, to generate a draw from a normal distribution N(1,2) with seed value 1776:
 ``` cpp
@@ -177,11 +192,11 @@ arma::mat beta_rvs = stats::rbeta<arma::mat>(100,100,3.0,2.0);
 arma::mat beta_cdf_vals = stats::pbeta(beta_rvs,3.0,2.0);
 ```
 
-## Compile-time Computation Capabilities
+## Compile-time Computing Capabilities
 
 StatsLib is designed to operate equally well as a compile-time computation engine. Compile-time computation allows the compiler to replace function calls (e.g., `dnorm(0,0,1)`) with static values in the source code. That is, functions are evaluated during the compilation process, rather than at run-time. This capability is made possible due to the templated `constexpr` design of the library and can be verified by inspecting the assembly code generated by the compiler. 
 
-The compile-time features are enabled using the `constexpr` specifier. The example below computes the pdf, cdf, and quantile function of the Laplace distribution:
+The compile-time features are enabled using the `constexpr` specifier. The example below computes the pdf, cdf, and quantile function of the Laplace distribution.
 ```cpp
 #include "stats.hpp"
 
