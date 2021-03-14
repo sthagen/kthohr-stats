@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2011-2020 Keith O'Hara
+  ##   Copyright (C) 2011-2021 Keith O'Hara
   ##
   ##   This file is part of the StatsLib C++ library.
   ##
@@ -51,6 +51,9 @@ noexcept
             //
             x == T(0) && shape_par < T(1) ? \
                 STLIM<T>::infinity() :
+			//
+            GCINT::is_posinf(x) ? \
+                log_zero_if<T>(log_form) :
             //
             exp_if(dweibull_log_compute(x/scale_par,shape_par,scale_par), !log_form) );
 }

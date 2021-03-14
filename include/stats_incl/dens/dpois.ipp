@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2011-2020 Keith O'Hara
+  ##   Copyright (C) 2011-2021 Keith O'Hara
   ##
   ##   This file is part of the StatsLib C++ library.
   ##
@@ -51,8 +51,8 @@ noexcept
             //
             rate_par == T(0) ? \
                 x == llint_t(0) ? \
-                    T(1) :
-                    T(0) :
+                    log_one_if<T>(log_form) :
+                    log_zero_if<T>(log_form) :
             //
             GCINT::is_posinf(rate_par) ? \
                 log_zero_if<T>(log_form) :

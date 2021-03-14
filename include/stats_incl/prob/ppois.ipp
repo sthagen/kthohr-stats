@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2011-2020 Keith O'Hara
+  ##   Copyright (C) 2011-2021 Keith O'Hara
   ##
   ##   This file is part of the StatsLib C++ library.
   ##
@@ -51,7 +51,7 @@ statslib_constexpr
 T
 ppois_compute(const llint_t x, const T rate_par)
 {
-    return( rate_par > T(10) ? \
+    return( rate_par > T(10) || x > llint_t(15) ? \
             // switch to incomplete gamma function
                 T(1) - gcem::incomplete_gamma(T(x+1),rate_par) :
             // else

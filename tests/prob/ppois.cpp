@@ -1,6 +1,6 @@
 /*################################################################################
   ##
-  ##   Copyright (C) 2011-2020 Keith O'Hara
+  ##   Copyright (C) 2011-2021 Keith O'Hara
   ##
   ##   This file is part of the StatsLib C++ library.
   ##
@@ -55,6 +55,10 @@ int main()
     STATS_TEST_EXPECTED_VAL(ppois,0,0.006737947,false,5);                                           // x == 0
 
     STATS_TEST_EXPECTED_VAL(ppois,-1,0,false,2);                                                    // x < 0
+
+    STATS_TEST_EXPECTED_VAL(ppois,15,0.9512596,false,10.0);
+    STATS_TEST_EXPECTED_VAL(ppois,20,0.9984117,false,10.0);
+    STATS_TEST_EXPECTED_VAL(ppois,100,1.0,false,10.0);
 
     //
     // vector/matrix tests
